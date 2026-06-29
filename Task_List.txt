@@ -1,0 +1,34 @@
+Student Management System - Task List
+Phase 1: Authentication & Student CRUD (Backend/Frontend Setup & Core Login)
+[ ] Initialize monorepo directory layout
+[ ] Setup Express + MongoDB Backend server boilerplate
+[ ] Setup React + Vite + Tailwind CSS Frontend boilerplate
+[ ] Define User and Student schemas in backend
+[ ] Implement JWT Authentication flow (signup, login, middleware protection)
+[ ] Develop Student Register/Edit/Delete API endpoints
+[ ] Build frontend Authentication pages (Login, Logout)
+[ ] Build frontend dashboard wrapper and initial Admin console for Students
+ Phase 2: Academic Setup (Classes, Subjects, and Teachers)
+[ ] Create Class, Section, Program models
+[ ] Create Subject schemas and link to Classes
+[ ] Teacher assignment to subjects and classes
+[ ] Build management forms in Admin portal
+ Phase 3: Attendance Management
+[ ] Implement attendance models (Present, Absent, Late, Leave)
+[ ] Implement Teacher marking UI
+[ ] Implement Student dashboard presence summaries and alerts
+ Phase 4: Exam & Result Management
+[ ] Implement Exam schedules and Result models
+[ ] Develop grades entry interface for Teachers
+[ ] Build dynamic student scorecard and transcript exports
+Phase 5: Fee Auditing & Receipts
+[ ] Implement fee allocation models
+[ ] Generate monthly challan receipts (paid / pending / overdue)
+[ ] Automatic fine generation rules for late fees
+Phase 6: Interactive Dashboard & Reporting
+[ ] Develop Admin statistics panel
+[ ] Enable attendance, result, and fee reports
+[ ] Implement PDF/Excel data export engines
+ Phase 7: Deployment & Polish
+[ ] Final deployment checks and environment configurations
+[ ] Deploy client to Vercel and API backend to Render
