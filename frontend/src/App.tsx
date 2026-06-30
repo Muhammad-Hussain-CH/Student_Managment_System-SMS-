@@ -7,6 +7,8 @@ import DashboardLayout from '@/components/layout/DashboardLayout';
 import LoginPage from '@/pages/LoginPage';
 import DashboardPage from '@/pages/DashboardPage';
 import StudentsPage from '@/pages/StudentsPage';
+import ClassesPage from '@/pages/ClassesPage';
+import SubjectsPage from '@/pages/SubjectsPage';
 import { useAuthStore } from '@/store/auth.store';
 
 const queryClient = new QueryClient({
@@ -45,7 +47,10 @@ function AppRoutes() {
           <Route path="/students" element={<StudentsPage />} />
           <Route path="/students/new" element={<Placeholder title="Register New Student" />} />
           <Route path="/students/:id" element={<Placeholder title="Student Detail" />} />
+          <Route path="/classes" element={<ClassesPage />} />
+<Route path="/subjects" element={<SubjectsPage />} />
           <Route path="/teachers" element={<Placeholder title="Teachers — Phase 2" />} />
+
           <Route path="/attendance" element={<Placeholder title="Attendance — Phase 3" />} />
           <Route path="/exams" element={<Placeholder title="Exams & Results — Phase 4" />} />
           <Route path="/fees" element={<Placeholder title="Fee Management — Phase 5" />} />

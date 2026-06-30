@@ -21,13 +21,16 @@ import {
   Menu,
   X,
   ChevronRight,
+  Layers,
 } from 'lucide-react';
 
 const navItems = {
   admin: [
-    { label: 'Dashboard', icon: LayoutDashboard, to: '/dashboard' },
-    { label: 'Students', icon: Users, to: '/students' },
-    { label: 'Teachers', icon: BookOpen, to: '/teachers' },
+  { label: 'Dashboard', icon: LayoutDashboard, to: '/dashboard' },
+  { label: 'Students', icon: Users, to: '/students' },
+  { label: 'Classes', icon: Layers, to: '/classes' },
+  { label: 'Subjects', icon: BookOpen, to: '/subjects' },
+  { label: 'Teachers', icon: BookOpen, to: '/teachers' },
     { label: 'Attendance', icon: CalendarCheck, to: '/attendance' },
     { label: 'Exams & Results', icon: FileText, to: '/exams' },
     { label: 'Fee Management', icon: DollarSign, to: '/fees' },
