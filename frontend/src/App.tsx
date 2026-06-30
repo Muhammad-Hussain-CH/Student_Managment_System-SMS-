@@ -9,6 +9,7 @@ import DashboardPage from '@/pages/DashboardPage';
 import StudentsPage from '@/pages/StudentsPage';
 import ClassesPage from '@/pages/ClassesPage';
 import SubjectsPage from '@/pages/SubjectsPage';
+import AttendancePage from '@/pages/AttendancePage';
 import { useAuthStore } from '@/store/auth.store';
 
 const queryClient = new QueryClient({
@@ -51,7 +52,7 @@ function AppRoutes() {
 <Route path="/subjects" element={<SubjectsPage />} />
           <Route path="/teachers" element={<Placeholder title="Teachers — Phase 2" />} />
 
-          <Route path="/attendance" element={<Placeholder title="Attendance — Phase 3" />} />
+          <Route path="/attendance" element={<AttendancePage />} />
           <Route path="/exams" element={<Placeholder title="Exams & Results — Phase 4" />} />
           <Route path="/fees" element={<Placeholder title="Fee Management — Phase 5" />} />
           <Route path="/reports" element={<Placeholder title="Reports & Analytics — Phase 6" />} />

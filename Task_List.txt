@@ -11,7 +11,7 @@ Phase 1: Authentication & Student CRUD (Backend/Frontend Setup & Core Login)
  Phase 2: Academic Setup (Classes, Subjects, and Teachers)
 [ ] Create Class, Section, Program models
 [ ] Create Subject schemas and link to Classes
-[ ] Teacher assignment to subjects and classes
+[ ] Teacher assignment to subjects and classes 
 [ ] Build management forms in Admin portal
  Phase 3: Attendance Management
 [ ] Implement attendance models (Present, Absent, Late, Leave)
