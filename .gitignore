@@ -1,3 +1,4 @@
+ HEAD
 # Dependencies
 node_modules/
 */node_modules/
@@ -9,9 +10,15 @@ node_modules/
 backend/.env
 frontend/.env
 
+# Dependency directories
+node_modules/
+jspm_packages/
+adeb2c67dfcf34d8e4809502957c2cb196d250a4
+
 # Build outputs
 dist/
 build/
+HEAD
 frontend/dist/
 
 # Logs
@@ -26,3 +33,28 @@ npm-debug.log*
 # OS
 .DS_Store
 Thumbs.db
+
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+*.log
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Editor directories and files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+ adeb2c67dfcf34d8e4809502957c2cb196d250a4
