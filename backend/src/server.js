@@ -15,6 +15,7 @@ import authRoutes from './routes/auth.routes.js';
 import studentRoutes from './routes/student.routes.js';
 import classRoutes from './routes/class.routes.js';
 import subjectRoutes from './routes/subject.routes.js';
+import teacherRoutes from './routes/teacher.routes.js';
 
 dotenv.config();
 
@@ -73,6 +74,7 @@ app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/classes', classRoutes);
 app.use('/api/subjects', subjectRoutes);
+app.use('/api/teachers', teacherRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {
