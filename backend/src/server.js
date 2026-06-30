@@ -16,6 +16,7 @@ import studentRoutes from './routes/student.routes.js';
 import classRoutes from './routes/class.routes.js';
 import subjectRoutes from './routes/subject.routes.js';
 import teacherRoutes from './routes/teacher.routes.js';
+import attendanceRoutes from './routes/attendance.routes.js';
 
 dotenv.config();
 
@@ -75,6 +76,7 @@ app.use('/api/students', studentRoutes);
 app.use('/api/classes', classRoutes);
 app.use('/api/subjects', subjectRoutes);
 app.use('/api/teachers', teacherRoutes);
+app.use('/api/attendance', attendanceRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {
