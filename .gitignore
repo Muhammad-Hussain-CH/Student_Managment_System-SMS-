@@ -9,7 +9,6 @@ node_modules/
 .env.production
 backend/.env
 frontend/.env
-
 # Dependency directories
 node_modules/
 jspm_packages/
