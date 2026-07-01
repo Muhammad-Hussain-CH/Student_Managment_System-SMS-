@@ -15,6 +15,7 @@ import { useAuthStore } from '@/store/auth.store';
 import MyAttendancePage from '@/pages/MyAttendancePage';
 import ExamsPage from '@/pages/ExamsPage';
 import MyResultsPage from '@/pages/MyResultsPage';
+import TeachersPage from '@/pages/TeachersPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -54,7 +55,7 @@ function AppRoutes() {
           <Route path="/students/:id" element={<Placeholder title="Student Detail" />} />
           <Route path="/classes" element={<ClassesPage />} />
 <Route path="/subjects" element={<SubjectsPage />} />
-          <Route path="/teachers" element={<Placeholder title="Teachers — Phase 2" />} />
+          <Route path="/teachers" element={<TeachersPage />} />
 
           <Route path="/attendance" element={<AttendancePage />} />
           <Route path="/exams" element={<ExamsPage />} />
