@@ -20,15 +20,42 @@ export default function MyAttendancePage() {
 
   const summaries = data || [];
   const hasShortage = summaries.some((s) => s.belowThreshold);
+  const averagePercentage = summaries.length > 0 ? Math.round(summaries.reduce((sum, s) => sum + s.percentage, 0) / summaries.length) : 0;
+  const subjectsBelow = summaries.filter((s) => s.belowThreshold).length;
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-5">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-800">My Attendance</h1>
-        <p className="text-sm text-slate-500 mt-0.5">
-          Attendance percentage per subject. Minimum required: 75%.
-        </p>
+    <div className="p-6 max-w-5xl mx-auto space-y-5">
+      <div className="relative overflow-hidden rounded-3xl border border-blue-200/60 bg-gradient-to-br from-white via-blue-50 to-cyan-50 p-6">
+        <div className="absolute -top-16 -right-14 h-40 w-40 rounded-full bg-blue-200/40 blur-3xl" />
+        <div className="absolute -bottom-16 -left-10 h-36 w-36 rounded-full bg-cyan-200/35 blur-3xl" />
+        <div className="relative">
+          <h1 className="text-2xl font-bold text-slate-800">My Attendance</h1>
+          <p className="text-sm text-slate-600 mt-1">
+            Attendance percentage per subject. Minimum required threshold is 75%.
+          </p>
+        </div>
       </div>
+
+      {!isLoading && summaries.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="card p-4">
+            <p className="text-xs text-slate-500 font-medium">Subjects</p>
+            <p className="text-2xl font-bold text-slate-800 mt-1">{summaries.length}</p>
+          </div>
+          <div className="card p-4">
+            <p className="text-xs text-slate-500 font-medium">Average Attendance</p>
+            <p className={cn('text-2xl font-bold mt-1', averagePercentage >= 75 ? 'text-green-600' : 'text-red-500')}>
+              {averagePercentage}%
+            </p>
+          </div>
+          <div className="card p-4">
+            <p className="text-xs text-slate-500 font-medium">Below Threshold</p>
+            <p className={cn('text-2xl font-bold mt-1', subjectsBelow > 0 ? 'text-red-500' : 'text-green-600')}>
+              {subjectsBelow}
+            </p>
+          </div>
+        </div>
+      )}
 
       {hasShortage && (
         <div className="card p-4 border-l-4 border-l-red-500 bg-red-50/50 flex items-start gap-3">
@@ -68,7 +95,7 @@ export default function MyAttendancePage() {
             <div key={s.subject._id} className="card p-5">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-3 flex-1 min-w-0">
-                  <div className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
+                  <div className="h-10 w-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center flex-shrink-0">
                     <BookOpen className="h-5 w-5 text-blue-600" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -82,7 +109,7 @@ export default function MyAttendancePage() {
                       )}
                     </div>
 
-                    <div className="mt-3">
+                    <div className="mt-3 rounded-xl border border-surface-100 bg-surface-50 p-3">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-xs text-slate-500">{s.total} total classes</span>
                         <span className={`text-sm font-bold ${s.percentage >= 75 ? 'text-green-600' : 'text-red-500'}`}>
@@ -104,7 +131,7 @@ export default function MyAttendancePage() {
                       </div>
                     </div>
 
-                    <div className="flex gap-4 mt-3">
+                    <div className="flex flex-wrap gap-3 mt-3">
                       <span className="text-xs text-green-600 font-medium">✓ {s.present} Present</span>
                       <span className="text-xs text-red-500 font-medium">✗ {s.absent} Absent</span>
                       <span className="text-xs text-amber-600 font-medium">⏰ {s.late} Late</span>

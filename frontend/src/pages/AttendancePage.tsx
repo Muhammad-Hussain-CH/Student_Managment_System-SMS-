@@ -49,6 +49,11 @@ export default function AttendancePage() {
   const students = studentsData?.data || [];
   const classes = classesData?.data || [];
   const subjects = subjectsData?.data || [];
+  const markedCount = students.filter((s) => !!marks[s._id]).length;
+  const presentCount = students.filter((s) => marks[s._id] === 'present').length;
+  const absentCount = students.filter((s) => marks[s._id] === 'absent').length;
+  const lateCount = students.filter((s) => marks[s._id] === 'late').length;
+  const leaveCount = students.filter((s) => marks[s._id] === 'leave').length;
 
   useEffect(() => {
     if (existingData?.data) {
@@ -91,10 +96,14 @@ export default function AttendancePage() {
   const canMark = classId && subjectId && date && students.length > 0;
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-5">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-800">Mark Attendance</h1>
-        <p className="text-sm text-slate-500 mt-0.5">Select a class, subject, and date to begin.</p>
+    <div className="p-6 max-w-6xl mx-auto space-y-4">
+      <div className="relative overflow-hidden rounded-2xl border border-primary-200/60 bg-gradient-to-br from-white via-primary-50 to-cyan-50 p-4 sm:p-5">
+        <div className="absolute -top-16 -right-12 h-32 w-32 rounded-full bg-primary-200/30 blur-3xl" />
+        <div className="absolute -bottom-16 -left-8 h-28 w-28 rounded-full bg-cyan-200/30 blur-3xl" />
+        <div className="relative">
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-800">Attendance Workspace</h1>
+          <p className="text-xs sm:text-sm text-slate-600 mt-0.5">Choose class, subject, and date to mark attendance quickly.</p>
+        </div>
       </div>
 
       <div className="card p-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -138,63 +147,115 @@ export default function AttendancePage() {
           <p className="text-slate-500 text-sm">No students found in this class.</p>
         </div>
       ) : (
-        <div className="card overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-3 border-b border-surface-100 bg-surface-50">
-            <p className="text-xs text-slate-500 font-medium">{students.length} students</p>
-            <div className="flex gap-2">
-              <button
-                onClick={() => markAllAs('present')}
-                className="text-xs px-2.5 py-1 rounded-lg border border-green-200 text-green-600 hover:bg-green-50 font-medium"
-              >
-                Mark all Present
-              </button>
-              <button
-                onClick={() => markAllAs('absent')}
-                className="text-xs px-2.5 py-1 rounded-lg border border-red-200 text-red-500 hover:bg-red-50 font-medium"
-              >
-                Mark all Absent
-              </button>
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
+            <div className="card p-3">
+              <p className="text-[11px] uppercase tracking-wide text-slate-400">Students</p>
+              <p className="text-xl font-bold text-slate-800 mt-1">{students.length}</p>
+            </div>
+            <div className="card p-3">
+              <p className="text-[11px] uppercase tracking-wide text-slate-400">Marked</p>
+              <p className="text-xl font-bold text-primary-600 mt-1">{markedCount}</p>
+            </div>
+            <div className="card p-3">
+              <p className="text-[11px] uppercase tracking-wide text-slate-400">Present</p>
+              <p className="text-xl font-bold text-green-600 mt-1">{presentCount}</p>
+            </div>
+            <div className="card p-3">
+              <p className="text-[11px] uppercase tracking-wide text-slate-400">Absent</p>
+              <p className="text-xl font-bold text-red-500 mt-1">{absentCount}</p>
+            </div>
+            <div className="card p-3">
+              <p className="text-[11px] uppercase tracking-wide text-slate-400">Late</p>
+              <p className="text-xl font-bold text-amber-600 mt-1">{lateCount}</p>
+            </div>
+            <div className="card p-3">
+              <p className="text-[11px] uppercase tracking-wide text-slate-400">Leave</p>
+              <p className="text-xl font-bold text-blue-600 mt-1">{leaveCount}</p>
             </div>
           </div>
 
-          <div className="divide-y divide-surface-100">
-            {students.map((student) => (
-              <div key={student._id} className="flex items-center justify-between px-5 py-3.5">
-                <div className="flex items-center gap-3 min-w-0">
-                  <Avatar name={student.user.name} url={student.photo?.url} size="sm" />
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-slate-800 truncate">{student.user.name}</p>
-                    <p className="text-xs text-slate-400 font-mono">{student.rollNo}</p>
+          <div className="card overflow-hidden">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between px-5 py-3 border-b border-surface-100 bg-surface-50">
+              <p className="text-xs text-slate-500 font-medium">Tap a status icon for each student</p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setMarks({})}
+                  className="text-xs px-2.5 py-1 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 font-medium"
+                >
+                  Clear all
+                </button>
+                <button
+                  onClick={() => markAllAs('present')}
+                  className="text-xs px-2.5 py-1 rounded-lg border border-green-200 text-green-600 hover:bg-green-50 font-medium"
+                >
+                  Mark all Present
+                </button>
+                <button
+                  onClick={() => markAllAs('absent')}
+                  className="text-xs px-2.5 py-1 rounded-lg border border-red-200 text-red-500 hover:bg-red-50 font-medium"
+                >
+                  Mark all Absent
+                </button>
+              </div>
+            </div>
+
+            <div className="px-5 py-2.5 border-b border-surface-100 bg-white">
+              <div className="flex flex-wrap gap-2">
+                {(Object.keys(statusConfig) as AttendanceStatus[]).map((status) => {
+                  const { label, color, icon: Icon } = statusConfig[status];
+                  return (
+                    <span key={status} className={cn('inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium', color)}>
+                      <Icon className="h-3.5 w-3.5" />
+                      {label}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="divide-y divide-surface-100 max-h-[55vh] overflow-y-auto">
+              {students.map((student) => (
+                <div key={student._id} className="flex items-center justify-between px-5 py-3.5">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <Avatar name={student.user.name} url={student.photo?.url} size="sm" />
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-slate-800 truncate">{student.user.name}</p>
+                      <p className="text-xs text-slate-400 font-mono">{student.rollNo}</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-1.5 flex-shrink-0">
+                    {(Object.keys(statusConfig) as AttendanceStatus[]).map((status) => {
+                      const { icon: Icon, color, activeColor } = statusConfig[status];
+                      const isActive = marks[student._id] === status;
+                      return (
+                        <button
+                          key={status}
+                          onClick={() => setMarks((m) => ({ ...m, [student._id]: status }))}
+                          title={statusConfig[status].label}
+                          className={cn(
+                            'h-8 w-8 rounded-lg border flex items-center justify-center transition-all',
+                            isActive ? activeColor : `${color} hover:bg-surface-50`
+                          )}
+                        >
+                          <Icon className="h-4 w-4" />
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
-                <div className="flex gap-1.5 flex-shrink-0">
-                  {(Object.keys(statusConfig) as AttendanceStatus[]).map((status) => {
-                    const { icon: Icon, color, activeColor } = statusConfig[status];
-                    const isActive = marks[student._id] === status;
-                    return (
-                      <button
-                        key={status}
-                        onClick={() => setMarks((m) => ({ ...m, [student._id]: status }))}
-                        title={statusConfig[status].label}
-                        className={cn(
-                          'h-8 w-8 rounded-lg border flex items-center justify-center transition-all',
-                          isActive ? activeColor : `${color} hover:bg-surface-50`
-                        )}
-                      >
-                        <Icon className="h-4 w-4" />
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
 
-          <div className="px-5 py-4 border-t border-surface-100 flex justify-end">
-            <Button onClick={() => submitMutation.mutate()} isLoading={submitMutation.isPending} disabled={!canMark}>
-              <Save className="h-4 w-4" />
-              Save Attendance
-            </Button>
+            <div className="px-5 py-4 border-t border-surface-100 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between bg-white">
+              <p className="text-xs text-slate-500">
+                Marked {markedCount} of {students.length} students
+              </p>
+              <Button onClick={() => submitMutation.mutate()} isLoading={submitMutation.isPending} disabled={!canMark}>
+                <Save className="h-4 w-4" />
+                Save Attendance
+              </Button>
+            </div>
           </div>
         </div>
       )}

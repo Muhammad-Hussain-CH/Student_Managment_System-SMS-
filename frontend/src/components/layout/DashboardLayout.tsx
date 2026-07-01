@@ -3,7 +3,6 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth.store';
 import { Avatar } from '@/components/ui/Avatar';
-import { Badge } from '@/components/ui/Badge';
 import toast from 'react-hot-toast';
 import api from '@/lib/axios';
 import {
@@ -48,12 +47,6 @@ const navItems = {
     { label: 'Results', icon: FileText, to: '/my-results' },
     { label: 'Fee Status', icon: DollarSign, to: '/my-fees' },
   ],
-};
-
-const roleBadge: Record<string, 'info' | 'warning' | 'success'> = {
-  admin: 'info',
-  teacher: 'warning',
-  student: 'success',
 };
 
 export default function DashboardLayout() {
@@ -130,15 +123,6 @@ export default function DashboardLayout() {
           <LogOut className="h-4 w-4" />
           Sign out
         </button>
-        <div className="flex items-center gap-3 px-3 py-3 mt-1 bg-surface-50 rounded-xl">
-          <Avatar name={user?.name || ''} url={user?.avatar?.url} size="sm" />
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-slate-800 truncate">{user?.name}</p>
-            <Badge variant={roleBadge[user?.role || 'student']} className="mt-0.5 capitalize">
-              {user?.role}
-            </Badge>
-          </div>
-        </div>
       </div>
     </div>
   );

@@ -16,6 +16,8 @@ import MyAttendancePage from '@/pages/MyAttendancePage';
 import ExamsPage from '@/pages/ExamsPage';
 import MyResultsPage from '@/pages/MyResultsPage';
 import TeachersPage from '@/pages/TeachersPage';
+import FeesPage from '@/pages/FeesPage';
+import MyFeesPage from '@/pages/MyFeesPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -59,7 +61,7 @@ function AppRoutes() {
 
           <Route path="/attendance" element={<AttendancePage />} />
           <Route path="/exams" element={<ExamsPage />} />
-          <Route path="/fees" element={<Placeholder title="Fee Management — Phase 5" />} />
+          <Route path="/fees" element={<FeesPage />} />
           <Route path="/reports" element={<Placeholder title="Reports & Analytics — Phase 6" />} />
           <Route path="/settings" element={<Placeholder title="Settings" />} />
         </Route>
@@ -72,7 +74,7 @@ function AppRoutes() {
           <Route path="/my-attendance" element={<MyAttendancePage />} />
 
           <Route path="/my-results" element={<MyResultsPage />} />
-          <Route path="/my-fees" element={<Placeholder title="My Fee Status" />} />
+          <Route path="/my-fees" element={<MyFeesPage />} />
         </Route>
       </Route>
 
