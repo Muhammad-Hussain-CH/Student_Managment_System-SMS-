@@ -12,6 +12,7 @@ import SubjectsPage from '@/pages/SubjectsPage';
 import AttendancePage from '@/pages/AttendancePage';
 import AddStudentPage from '@/pages/AddStudentPage';
 import { useAuthStore } from '@/store/auth.store';
+import MyAttendancePage from '@/pages/MyAttendancePage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -32,14 +33,14 @@ const Placeholder = ({ title }: { title: string }) => (
 );
 
 function AppRoutes() {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
 
   return (
     <Routes>
       {/* Public */}
       <Route
         path="/login"
-        element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />}
+        element={isAuthenticated ? <Navigate to={user?.role === 'student' ? '/my-profile' : '/dashboard'} replace /> : <LoginPage />}
       />
 
       {/* Admin + Teacher */}
@@ -65,7 +66,8 @@ function AppRoutes() {
       <Route element={<ProtectedRoute allowedRoles={['student']} />}>
         <Route element={<DashboardLayout />}>
           <Route path="/my-profile" element={<Placeholder title="My Profile" />} />
-          <Route path="/my-attendance" element={<Placeholder title="My Attendance" />} />
+          <Route path="/my-attendance" element={<MyAttendancePage />} />
+
           <Route path="/my-results" element={<Placeholder title="My Results" />} />
           <Route path="/my-fees" element={<Placeholder title="My Fee Status" />} />
         </Route>
