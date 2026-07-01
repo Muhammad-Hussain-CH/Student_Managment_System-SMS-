@@ -13,6 +13,8 @@ import AttendancePage from '@/pages/AttendancePage';
 import AddStudentPage from '@/pages/AddStudentPage';
 import { useAuthStore } from '@/store/auth.store';
 import MyAttendancePage from '@/pages/MyAttendancePage';
+import ExamsPage from '@/pages/ExamsPage';
+import MyResultsPage from '@/pages/MyResultsPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -55,7 +57,7 @@ function AppRoutes() {
           <Route path="/teachers" element={<Placeholder title="Teachers — Phase 2" />} />
 
           <Route path="/attendance" element={<AttendancePage />} />
-          <Route path="/exams" element={<Placeholder title="Exams & Results — Phase 4" />} />
+          <Route path="/exams" element={<ExamsPage />} />
           <Route path="/fees" element={<Placeholder title="Fee Management — Phase 5" />} />
           <Route path="/reports" element={<Placeholder title="Reports & Analytics — Phase 6" />} />
           <Route path="/settings" element={<Placeholder title="Settings" />} />
@@ -68,7 +70,7 @@ function AppRoutes() {
           <Route path="/my-profile" element={<Placeholder title="My Profile" />} />
           <Route path="/my-attendance" element={<MyAttendancePage />} />
 
-          <Route path="/my-results" element={<Placeholder title="My Results" />} />
+          <Route path="/my-results" element={<MyResultsPage />} />
           <Route path="/my-fees" element={<Placeholder title="My Fee Status" />} />
         </Route>
       </Route>
