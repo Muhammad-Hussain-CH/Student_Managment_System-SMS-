@@ -134,24 +134,31 @@ export default function FeesPage() {
   const classes = classesData?.data || [];
   const students = studentsData?.data || [];
   const payments = paymentsData?.data || [];
+  const paidCount = payments.filter((payment) => payment.status === 'paid').length;
+  const overdueCount = payments.filter((payment) => payment.status === 'overdue').length;
 
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-5">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">Fee Management</h1>
-          <p className="text-sm text-slate-500 mt-0.5">
-            {paymentsData?.pagination ? `${paymentsData.pagination.total} payment records` : 'Loading...'}
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="secondary" onClick={() => updateOverdueMutation.mutate()} isLoading={updateOverdueMutation.isPending}>
-            Update Overdue
-          </Button>
-          <Button onClick={() => setShowForm(!showForm)}>
-            {showForm ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-            {showForm ? 'Cancel' : 'Create Fee'}
-          </Button>
+    <div className="p-5 max-w-6xl mx-auto space-y-4">
+      <div className="rounded-2xl border border-surface-200 bg-white px-5 py-4 shadow-sm">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-amber-700">Fee Management</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-800 leading-tight">Fee Management</h1>
+            <p className="text-sm text-slate-500">
+              {paymentsData?.pagination ? `${paymentsData.pagination.total} payment records` : 'Loading...'}
+            </p>
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            <Badge variant="success">Paid {paidCount}</Badge>
+            <Badge variant={overdueCount > 0 ? 'danger' : 'info'}>Overdue {overdueCount}</Badge>
+            <Button variant="secondary" onClick={() => updateOverdueMutation.mutate()} isLoading={updateOverdueMutation.isPending}>
+              Update Overdue
+            </Button>
+            <Button onClick={() => setShowForm(!showForm)}>
+              {showForm ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+              {showForm ? 'Cancel' : 'Create Fee'}
+            </Button>
+          </div>
         </div>
       </div>
 

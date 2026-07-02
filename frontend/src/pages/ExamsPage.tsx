@@ -126,6 +126,9 @@ export default function ExamsPage() {
   const classes = classesData?.data || [];
   const subjects = subjectsData?.data || [];
   const examStudents = examStudentsData?.data || [];
+  const totalExams = exams.length;
+  const midterms = exams.filter((exam) => exam.type === 'midterm').length;
+  const finals = exams.filter((exam) => exam.type === 'final').length;
 
   const gradeColor: Record<string, string> = {
     A: 'bg-green-100 text-green-700',
@@ -136,18 +139,26 @@ export default function ExamsPage() {
   };
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-5">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">Exams & Results</h1>
-          <p className="text-sm text-slate-500 mt-0.5">
-            {examsData?.pagination ? `${examsData.pagination.total} exams` : 'Loading...'}
-          </p>
+    <div className="p-5 max-w-6xl mx-auto space-y-4">
+      <div className="rounded-2xl border border-surface-200 bg-white px-5 py-4 shadow-sm">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-violet-700">Exams & Results</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-800 leading-tight">Exams & Results</h1>
+            <p className="text-sm text-slate-500">
+              {examsData?.pagination ? `${examsData.pagination.total} exams` : 'Loading...'}
+            </p>
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            <Badge variant="info">Total {totalExams}</Badge>
+            <Badge variant="default">Midterms {midterms}</Badge>
+            <Badge variant="warning">Finals {finals}</Badge>
+            <Button onClick={() => setShowForm(!showForm)}>
+              {showForm ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+              {showForm ? 'Cancel' : 'Create Exam'}
+            </Button>
+          </div>
         </div>
-        <Button onClick={() => setShowForm(!showForm)}>
-          {showForm ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-          {showForm ? 'Cancel' : 'Create Exam'}
-        </Button>
       </div>
 
       {/* Create exam form */}
@@ -215,7 +226,7 @@ export default function ExamsPage() {
           ))}
         </div>
       ) : exams.length === 0 ? (
-        <div className="card p-12 text-center">
+        <div className="card p-10 text-center">
           <FileText className="h-10 w-10 text-slate-300 mx-auto mb-3" />
           <p className="text-slate-500 text-sm">No exams created yet.</p>
         </div>
@@ -229,7 +240,7 @@ export default function ExamsPage() {
               <div key={exam._id} className="card overflow-hidden">
                 {/* Exam header */}
                 <div
-                  className="flex items-center justify-between p-5 cursor-pointer hover:bg-surface-50 transition-colors"
+                  className="flex items-center justify-between p-4 sm:p-5 cursor-pointer hover:bg-surface-50 transition-colors"
                   onClick={() => {
                     setExpandedExam(isExpanded ? null : exam._id);
                     setMarks({});

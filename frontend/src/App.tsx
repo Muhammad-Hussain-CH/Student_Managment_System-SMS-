@@ -18,6 +18,7 @@ import MyResultsPage from '@/pages/MyResultsPage';
 import TeachersPage from '@/pages/TeachersPage';
 import FeesPage from '@/pages/FeesPage';
 import MyFeesPage from '@/pages/MyFeesPage';
+import MyProfilePage from './pages/MyProfilePage.tsx';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -70,7 +71,7 @@ function AppRoutes() {
       {/* Student self-portal */}
       <Route element={<ProtectedRoute allowedRoles={['student']} />}>
         <Route element={<DashboardLayout />}>
-          <Route path="/my-profile" element={<Placeholder title="My Profile" />} />
+          <Route path="/my-profile" element={<MyProfilePage />} />
           <Route path="/my-attendance" element={<MyAttendancePage />} />
 
           <Route path="/my-results" element={<MyResultsPage />} />

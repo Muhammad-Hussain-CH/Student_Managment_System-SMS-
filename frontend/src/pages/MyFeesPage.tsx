@@ -41,15 +41,29 @@ export default function MyFeesPage() {
 
   const payments = data || [];
   const hasOverdue = payments.some((p) => p.status === 'overdue');
+  const totalPaid = payments.filter((p) => p.status === 'paid').length;
+  const totalOverdue = payments.filter((p) => p.status === 'overdue').length;
   const totalPending = payments
     .filter((p) => p.status !== 'paid')
     .reduce((sum, p) => sum + p.totalDue, 0);
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-5">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-800">My Fee Status</h1>
-        <p className="text-sm text-slate-500 mt-0.5">Your fee records and payment status.</p>
+    <div className="p-5 max-w-6xl mx-auto space-y-4">
+      <div className="rounded-2xl border border-surface-200 bg-white px-5 py-4 shadow-sm">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-amber-700">Student Fees</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-800 leading-tight">My Fee Status</h1>
+            <p className="text-sm text-slate-500">Payment records, fines, and challan status.</p>
+          </div>
+          {payments.length > 0 && (
+            <div className="flex gap-2 flex-wrap">
+              <Badge variant="success">Paid {totalPaid}</Badge>
+              <Badge variant={totalOverdue > 0 ? 'danger' : 'info'}>Overdue {totalOverdue}</Badge>
+              <Badge variant="warning">Pending PKR {totalPending.toLocaleString()}</Badge>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Overdue alert */}
@@ -67,7 +81,7 @@ export default function MyFeesPage() {
 
       {/* Summary card */}
       {payments.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="card p-4">
             <p className="text-xs text-slate-500 font-medium">Total Records</p>
             <p className="text-2xl font-bold text-slate-800 mt-1">{payments.length}</p>
@@ -91,11 +105,11 @@ export default function MyFeesPage() {
       {isLoading ? (
         <div className="space-y-3">
           {Array.from({ length: 2 }).map((_, i) => (
-            <div key={i} className="card p-5 h-32 animate-pulse bg-surface-100" />
+            <div key={i} className="card p-4 h-24 animate-pulse bg-surface-100" />
           ))}
         </div>
       ) : payments.length === 0 ? (
-        <div className="card p-12 text-center">
+        <div className="card p-10 text-center">
           <DollarSign className="h-10 w-10 text-slate-300 mx-auto mb-3" />
           <p className="text-slate-500 text-sm">No fee records found.</p>
         </div>
@@ -104,7 +118,7 @@ export default function MyFeesPage() {
           {payments.map((payment) => {
             const Icon = statusIcon[payment.status] || Clock;
             return (
-              <div key={payment._id} className="card p-5">
+              <div key={payment._id} className="card p-4 sm:p-5">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-3 flex-1 min-w-0">
                     <div className="h-10 w-10 rounded-xl bg-primary-50 flex items-center justify-center flex-shrink-0">
@@ -125,7 +139,7 @@ export default function MyFeesPage() {
                       </p>
 
                       {/* Amount breakdown */}
-                      <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                         <div className="bg-surface-50 rounded-xl p-2.5">
                           <p className="text-xs text-slate-400">Amount Due</p>
                           <p className="text-sm font-semibold text-slate-700 mt-0.5">

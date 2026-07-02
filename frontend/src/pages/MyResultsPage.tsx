@@ -39,31 +39,44 @@ export default function MyResultsPage() {
   });
 
   const results = data || [];
+  const averagePercentage = results.length > 0 ? Math.round(results.reduce((sum, result) => sum + result.percentage, 0) / results.length) : 0;
+  const passedCount = results.filter((result) => result.grade !== 'F').length;
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-5">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-800">My Results</h1>
-        <p className="text-sm text-slate-500 mt-0.5">
-          Your exam results and grades.
-        </p>
+    <div className="p-5 max-w-6xl mx-auto space-y-4">
+      <div className="rounded-2xl border border-surface-200 bg-white px-5 py-4 shadow-sm">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-violet-700">Student Results</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-800 leading-tight">My Results</h1>
+            <p className="text-sm text-slate-500">Exam results, grades, and score breakdowns.</p>
+          </div>
+          {results.length > 0 && (
+            <div className="flex gap-2 flex-wrap">
+              <Badge variant="info">Avg {averagePercentage}%</Badge>
+              <Badge variant={passedCount === results.length ? 'success' : 'warning'}>
+                {passedCount}/{results.length} passed
+              </Badge>
+            </div>
+          )}
+        </div>
       </div>
 
       {isLoading ? (
         <div className="space-y-3">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="card p-5 h-24 animate-pulse bg-surface-100" />
+            <div key={i} className="card p-4 h-20 animate-pulse bg-surface-100" />
           ))}
         </div>
       ) : results.length === 0 ? (
-        <div className="card p-12 text-center">
+        <div className="card p-10 text-center">
           <FileText className="h-10 w-10 text-slate-300 mx-auto mb-3" />
           <p className="text-slate-500 text-sm">No results available yet.</p>
         </div>
       ) : (
         <div className="space-y-3">
           {results.map((result) => (
-            <div key={result._id} className="card p-5">
+            <div key={result._id} className="card p-4 sm:p-5">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-3 flex-1 min-w-0">
                   <div className="h-10 w-10 rounded-xl bg-primary-50 flex items-center justify-center flex-shrink-0">
@@ -83,7 +96,7 @@ export default function MyResultsPage() {
                     </p>
 
                     {/* Progress bar */}
-                    <div className="mt-3">
+                    <div className="mt-3 rounded-xl border border-surface-100 bg-surface-50 p-3">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-xs text-slate-500">
                           {result.obtainedMarks} / {result.exam.totalMarks} marks

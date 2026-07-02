@@ -24,20 +24,25 @@ export default function MyAttendancePage() {
   const subjectsBelow = summaries.filter((s) => s.belowThreshold).length;
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-5">
-      <div className="relative overflow-hidden rounded-3xl border border-blue-200/60 bg-gradient-to-br from-white via-blue-50 to-cyan-50 p-6">
-        <div className="absolute -top-16 -right-14 h-40 w-40 rounded-full bg-blue-200/40 blur-3xl" />
-        <div className="absolute -bottom-16 -left-10 h-36 w-36 rounded-full bg-cyan-200/35 blur-3xl" />
-        <div className="relative">
-          <h1 className="text-2xl font-bold text-slate-800">My Attendance</h1>
-          <p className="text-sm text-slate-600 mt-1">
-            Attendance percentage per subject. Minimum required threshold is 75%.
-          </p>
+    <div className="p-5 max-w-6xl mx-auto space-y-4">
+      <div className="rounded-2xl border border-surface-200 bg-white px-5 py-4 shadow-sm">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-blue-700">Student Attendance</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-800 leading-tight">My Attendance</h1>
+            <p className="text-sm text-slate-500">Attendance by subject with a 75% threshold.</p>
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            <Badge variant="info">Avg {averagePercentage}%</Badge>
+            <Badge variant={subjectsBelow > 0 ? 'danger' : 'success'}>
+              {subjectsBelow > 0 ? `${subjectsBelow} below` : 'All good'}
+            </Badge>
+          </div>
         </div>
       </div>
 
       {!isLoading && summaries.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="card p-4">
             <p className="text-xs text-slate-500 font-medium">Subjects</p>
             <p className="text-2xl font-bold text-slate-800 mt-1">{summaries.length}</p>
@@ -81,18 +86,18 @@ export default function MyAttendancePage() {
       {isLoading ? (
         <div className="space-y-3">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="card p-5 h-24 animate-pulse bg-surface-100" />
+            <div key={i} className="card p-4 h-20 animate-pulse bg-surface-100" />
           ))}
         </div>
       ) : summaries.length === 0 ? (
-        <div className="card p-12 text-center">
+        <div className="card p-10 text-center">
           <BookOpen className="h-10 w-10 text-slate-300 mx-auto mb-3" />
           <p className="text-slate-500 text-sm">No attendance records found yet.</p>
         </div>
       ) : (
         <div className="space-y-3">
           {summaries.map((s) => (
-            <div key={s.subject._id} className="card p-5">
+            <div key={s.subject._id} className="card p-4 sm:p-5">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-3 flex-1 min-w-0">
                   <div className="h-10 w-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center flex-shrink-0">
@@ -131,7 +136,7 @@ export default function MyAttendancePage() {
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-3 mt-3">
+                    <div className="flex flex-wrap gap-3 mt-2.5">
                       <span className="text-xs text-green-600 font-medium">✓ {s.present} Present</span>
                       <span className="text-xs text-red-500 font-medium">✗ {s.absent} Absent</span>
                       <span className="text-xs text-amber-600 font-medium">⏰ {s.late} Late</span>
