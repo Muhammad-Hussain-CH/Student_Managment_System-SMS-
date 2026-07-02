@@ -1,23 +1,31 @@
 import { useQuery } from '@tanstack/react-query';
-import { Users, BookOpen, CalendarCheck, DollarSign, TrendingUp, TrendingDown, AlertCircle } from 'lucide-react';
+import {
+  Users, BookOpen, CalendarCheck, DollarSign,
+  TrendingUp, TrendingDown, GraduationCap, AlertCircle
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
 import api from '@/lib/axios';
 import { useAuthStore } from '@/store/auth.store';
+import { Avatar } from '@/components/ui/Avatar';
+import { formatDate } from '@/lib/utils';
 
 interface DashboardStats {
   totalStudents: number;
   totalTeachers: number;
   attendanceRate: number;
-  feeCollection: number;
-  recentStudents: Array<{ _id: string; user: { name: string; email: string }; rollNo: string; program: string }>;
+  feeCollected: number;
+  feePending: number;
+  recentStudents: Array<{
+    _id: string;
+    rollNo: string;
+    program: string;
+    user: { name: string; email: string };
+    createdAt: string;
+  }>;
 }
 
 const StatCard = ({
-  label,
-  value,
-  icon: Icon,
-  color,
-  trend,
-  trendLabel,
+  label, value, icon: Icon, color, trend, trendLabel,
 }: {
   label: string;
   value: string | number;
@@ -48,14 +56,13 @@ const StatCard = ({
 export default function DashboardPage() {
   const { user } = useAuthStore();
 
-  const { data: stats, isLoading, error } = useQuery<DashboardStats>({
+  const { data: stats, isLoading } = useQuery<DashboardStats>({
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
       const res = await api.get('/dashboard/stats');
       return res.data.data;
     },
-    // Placeholder until backend endpoint is built in Phase 6
-    enabled: false,
+    enabled: user?.role === 'admin',
   });
 
   const greeting = () => {
@@ -78,56 +85,80 @@ export default function DashboardPage() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <StatCard
-          label="Total Students"
-          value={isLoading ? '—' : stats?.totalStudents ?? '—'}
-          icon={Users}
-          color="bg-primary-50 text-primary-600"
-          trend="up"
-          trendLabel="+12 this month"
-        />
-        <StatCard
-          label="Total Teachers"
-          value={isLoading ? '—' : stats?.totalTeachers ?? '—'}
-          icon={BookOpen}
-          color="bg-blue-50 text-blue-600"
-        />
-        <StatCard
-          label="Attendance Rate"
-          value={isLoading ? '—' : `${stats?.attendanceRate ?? '—'}%`}
-          icon={CalendarCheck}
-          color="bg-green-50 text-green-600"
-          trend="down"
-          trendLabel="-2% vs last week"
-        />
-        <StatCard
-          label="Fee Collected"
-          value={isLoading ? '—' : `PKR ${(stats?.feeCollection ?? 0).toLocaleString()}`}
-          icon={DollarSign}
-          color="bg-amber-50 text-amber-600"
-          trend="up"
-          trendLabel="85% collected"
-        />
-      </div>
+      {user?.role === 'admin' && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          <StatCard
+            label="Total Students"
+            value={isLoading ? '...' : stats?.totalStudents ?? 0}
+            icon={Users}
+            color="bg-primary-50 text-primary-600"
+            trend="up"
+            trendLabel="Active enrollments"
+          />
+          <StatCard
+            label="Total Teachers"
+            value={isLoading ? '...' : stats?.totalTeachers ?? 0}
+            icon={GraduationCap}
+            color="bg-blue-50 text-blue-600"
+          />
+          <StatCard
+            label="Attendance Rate"
+            value={isLoading ? '...' : `${stats?.attendanceRate ?? 0}%`}
+            icon={CalendarCheck}
+            color="bg-green-50 text-green-600"
+            trend={stats?.attendanceRate && stats.attendanceRate >= 75 ? 'up' : 'down'}
+            trendLabel={stats?.attendanceRate && stats.attendanceRate < 75 ? 'Below threshold' : 'On track'}
+          />
+          <StatCard
+            label="Fee Collected"
+            value={isLoading ? '...' : `PKR ${(stats?.feeCollected ?? 0).toLocaleString()}`}
+            icon={DollarSign}
+            color="bg-amber-50 text-amber-600"
+            trend="up"
+            trendLabel={`PKR ${(stats?.feePending ?? 0).toLocaleString()} pending`}
+          />
+        </div>
+      )}
 
-      {/* Placeholder notice for Phase 1 */}
-      <div className="card p-5 border-l-4 border-l-primary-500">
-        <div className="flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-primary-500 flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="text-sm font-semibold text-slate-800">Phase 1 Complete — Auth & Student CRUD</p>
-            <p className="text-sm text-slate-500 mt-1">
-              Authentication, role-based access, and student management are live. Dashboard statistics will populate in Phase 6 when the reports module is built.
-            </p>
-            <div className="flex flex-wrap gap-2 mt-3">
-              {['✅ Auth & JWT', '✅ Role-based access', '✅ Student CRUD', '🔜 Classes & Subjects', '🔜 Attendance', '🔜 Exams', '🔜 Fees', '🔜 Reports'].map((p) => (
-                <span key={p} className="text-xs bg-surface-100 text-slate-600 px-2 py-1 rounded-lg font-mono">{p}</span>
-              ))}
-            </div>
-          </div>
+      {/* Teacher dashboard */}
+     {/* Teacher dashboard */}
+{user?.role === 'teacher' && (
+  <div className="space-y-5">
+    {/* Quick actions */}
+    <div className="card p-5">
+      <h2 className="text-sm font-semibold text-slate-700 mb-3">Quick Actions</h2>
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        {[
+          { label: 'Mark Attendance', icon: CalendarCheck, to: '/attendance' },
+          { label: 'Enter Results', icon: BookOpen, to: '/exams' },
+          { label: 'View Students', icon: Users, to: '/students' },
+        ].map(({ label, icon: Icon, to }) => (
+          <Link
+            key={label}
+            to={to}
+            className="flex flex-col items-center gap-2 p-4 rounded-xl border border-surface-200 hover:border-primary-300 hover:bg-primary-50 transition-all group"
+          >
+            <Icon className="h-5 w-5 text-slate-400 group-hover:text-primary-600 transition-colors" />
+            <span className="text-xs font-medium text-slate-600 group-hover:text-primary-700 text-center">{label}</span>
+          </Link>
+        ))}
+      </div>
+    </div>
+
+    {/* Teacher info card */}
+    <div className="card p-5 border-l-4 border-l-blue-500">
+      <div className="flex items-start gap-3">
+        <BookOpen className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
+        <div>
+          <p className="text-sm font-semibold text-slate-800">Welcome to your portal</p>
+          <p className="text-sm text-slate-500 mt-1">
+            You can mark attendance for your classes, enter exam results, and view students assigned to your subjects.
+          </p>
         </div>
       </div>
+    </div>
+  </div>
+)}
 
       {/* Quick Actions */}
       {user?.role === 'admin' && (
@@ -138,16 +169,49 @@ export default function DashboardPage() {
               { label: 'Add Student', icon: Users, to: '/students/new' },
               { label: 'Mark Attendance', icon: CalendarCheck, to: '/attendance' },
               { label: 'Enter Results', icon: BookOpen, to: '/exams' },
-              { label: 'Generate Report', icon: TrendingUp, to: '/reports' },
-            ].map(({ label, icon: Icon }) => (
-              <button key={label} className="flex flex-col items-center gap-2 p-4 rounded-xl border border-surface-200 hover:border-primary-300 hover:bg-primary-50 transition-all group">
+              { label: 'Manage Fees', icon: DollarSign, to: '/fees' },
+            ].map(({ label, icon: Icon, to }) => (
+              <Link
+                key={label}
+                to={to}
+                className="flex flex-col items-center gap-2 p-4 rounded-xl border border-surface-200 hover:border-primary-300 hover:bg-primary-50 transition-all group"
+              >
                 <Icon className="h-5 w-5 text-slate-400 group-hover:text-primary-600 transition-colors" />
                 <span className="text-xs font-medium text-slate-600 group-hover:text-primary-700 text-center">{label}</span>
-              </button>
+              </Link>
             ))}
           </div>
         </div>
       )}
+
+      {/* Recent Students */}
+      {user?.role === 'admin' && !isLoading && stats?.recentStudents && stats.recentStudents.length > 0 && (
+        <div className="card overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-surface-100">
+            <h2 className="text-sm font-semibold text-slate-700">Recently Registered Students</h2>
+            <Link to="/students" className="text-xs text-primary-600 hover:text-primary-700 font-medium">
+              View all →
+            </Link>
+          </div>
+          <div className="divide-y divide-surface-100">
+            {stats.recentStudents.map((student) => (
+              <div key={student._id} className="flex items-center justify-between px-5 py-3.5">
+                <div className="flex items-center gap-3">
+                  <Avatar name={student.user?.name || 'S'} size="sm" />
+                  <div>
+                    <p className="text-sm font-medium text-slate-800">{student.user?.name}</p>
+                    <p className="text-xs text-slate-400 font-mono">{student.rollNo} • {student.program}</p>
+                  </div>
+                </div>
+                <p className="text-xs text-slate-400">{formatDate(student.createdAt)}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      
+      
     </div>
   );
 }

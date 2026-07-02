@@ -19,6 +19,9 @@ import TeachersPage from '@/pages/TeachersPage';
 import FeesPage from '@/pages/FeesPage';
 import MyFeesPage from '@/pages/MyFeesPage';
 import MyProfilePage from './pages/MyProfilePage.tsx';
+import ReportsPage from '@/pages/ReportsPage';
+import StudentDetailPage from '@/pages/StudentDetailPage';
+import SettingsPage from '@/pages/SettingsPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -55,7 +58,7 @@ function AppRoutes() {
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/students" element={<StudentsPage />} />
             <Route path="/students/new" element={<AddStudentPage />} />
-          <Route path="/students/:id" element={<Placeholder title="Student Detail" />} />
+          <Route path="/students/:id" element={<StudentDetailPage />} />
           <Route path="/classes" element={<ClassesPage />} />
 <Route path="/subjects" element={<SubjectsPage />} />
           <Route path="/teachers" element={<TeachersPage />} />
@@ -63,8 +66,8 @@ function AppRoutes() {
           <Route path="/attendance" element={<AttendancePage />} />
           <Route path="/exams" element={<ExamsPage />} />
           <Route path="/fees" element={<FeesPage />} />
-          <Route path="/reports" element={<Placeholder title="Reports & Analytics — Phase 6" />} />
-          <Route path="/settings" element={<Placeholder title="Settings" />} />
+          <Route path="/reports" element={<ReportsPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
         </Route>
       </Route>
 
