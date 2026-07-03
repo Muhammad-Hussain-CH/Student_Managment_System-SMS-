@@ -20,9 +20,10 @@ const registerValidation = [
   body('password')
     .isLength({ min: 8 })
     .withMessage('Password must be at least 8 characters'),
-  body('role')
-    .isIn(['admin', 'teacher', 'student'])
-    .withMessage('Role must be admin, teacher, or student'),
+  body('roleKey')
+    .trim()
+    .notEmpty()
+    .withMessage('Role key is required'),
 ];
 
 const loginValidation = [

@@ -9,19 +9,24 @@ import { ApiError, asyncHandler, sendSuccess } from '../utils/api.utils.js';
  * Admin only — register any user type
  */
 export const register = asyncHandler(async (req, res) => {
-  const { name, email, password, role, program, qualification, department } = req.body;
+  const { name, email, password, roleKey, program, qualification, department } = req.body;
 
   // Check duplicate
   const existing = await User.findOne({ email });
   if (existing) throw new ApiError('Email already in use.', 409);
 
-  const user = await User.create({ name, email, password, role });
+  // Find role by key
+  const Role = (await import('../models/Role.model.js')).default;
+  const roleDoc = await Role.findOne({ key: roleKey });
+  if (!roleDoc) throw new ApiError('Role not found.', 404);
+
+  const user = await User.create({ name, email, password, role: roleDoc._id });
 
   // Create role-specific profile
-  if (role === 'student') {
+  if (roleKey === 'student') {
     const rollNo = await Student.generateRollNo(program || 'GEN');
     await Student.create({ user: user._id, rollNo, program: program || 'General' });
-  } else if (role === 'teacher') {
+  } else if (roleKey === 'teacher') {
     const employeeId = await Teacher.generateEmployeeId();
     await Teacher.create({ user: user._id, employeeId, qualification, department });
   }
@@ -39,7 +44,7 @@ export const login = asyncHandler(async (req, res) => {
     throw new ApiError('Email and password are required.', 400);
   }
 
-  const user = await User.findOne({ email }).select('+password');
+  const user = await User.findOne({ email }).select('+password').populate('role');
   if (!user || !(await user.comparePassword(password))) {
     throw new ApiError('Invalid email or password.', 401);
   }
@@ -67,12 +72,12 @@ export const logout = asyncHandler(async (req, res) => {
  * Returns current authenticated user + their profile
  */
 export const getMe = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id);
+  const user = await User.findById(req.user._id).populate('role');
 
   let profile = null;
-  if (user.role === 'student') {
+  if (user.role?.key === 'student') {
     profile = await Student.findOne({ user: user._id }).populate('class');
-  } else if (user.role === 'teacher') {
+  } else if (user.role?.key === 'teacher') {
     profile = await Teacher.findOne({ user: user._id }).populate('subjects');
   }
 
@@ -89,10 +94,10 @@ export const refreshToken = asyncHandler(async (req, res) => {
 
   try {
     const decoded = verifyToken(token, process.env.JWT_REFRESH_SECRET);
-    const user = await User.findById(decoded.id);
+    const user = await User.findById(decoded.id).populate('role');
     if (!user) throw new ApiError('User not found.', 401);
 
-    const accessToken = generateAccessToken(user._id);
+    const accessToken = generateAccessToken(user._id, user.role?.key, user.role?.permissions || []);
     sendSuccess(res, { accessToken });
   } catch {
     throw new ApiError('Refresh token invalid or expired.', 401);

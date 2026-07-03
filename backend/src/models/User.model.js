@@ -24,9 +24,9 @@ const userSchema = new mongoose.Schema(
       select: false,
     },
     role: {
-      type: String,
-      enum: ['admin', 'teacher', 'student'],
-      default: 'student',
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Role',
+      required: [true, 'Role is required'],
     },
     avatar: {
       public_id: { type: String, default: null },

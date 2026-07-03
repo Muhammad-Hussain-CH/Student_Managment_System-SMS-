@@ -3,10 +3,14 @@ import jwt from 'jsonwebtoken';
 /**
  * Generate access token (short-lived)
  */
-export const generateAccessToken = (userId) => {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN || '7d',
-  });
+export const generateAccessToken = (userId, roleKey = null, permissions = []) => {
+  return jwt.sign(
+    { id: userId, roleKey, permissions },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+    }
+  );
 };
 
 /**
@@ -29,7 +33,12 @@ export const verifyToken = (token, secret) => {
  * Set token in HTTP-only cookie
  */
 export const sendTokenResponse = (user, statusCode, res) => {
-  const accessToken = generateAccessToken(user._id);
+  // Prepare role info (user.role may be ObjectId or populated object)
+  const role = typeof user.role === 'object' && user.role !== null ? user.role : { _id: user.role };
+  const roleKey = role?.key || 'unknown';
+  const permissions = role?.permissions || [];
+
+  const accessToken = generateAccessToken(user._id, roleKey, permissions);
   const refreshToken = generateRefreshToken(user._id);
 
   const cookieOptions = {
@@ -51,7 +60,13 @@ export const sendTokenResponse = (user, statusCode, res) => {
         _id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role,
+        role: {
+          _id: role._id,
+          key: role.key,
+          name: role.name,
+          permissions: role.permissions,
+          homeRoute: role.homeRoute,
+        },
         avatar: user.avatar,
       },
     });

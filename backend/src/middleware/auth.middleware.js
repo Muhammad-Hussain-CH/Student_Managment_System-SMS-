@@ -18,7 +18,7 @@ export const protect = asyncHandler(async (req, res, next) => {
 
   try {
     const decoded = verifyToken(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id).select('-password');
+    const user = await User.findById(decoded.id).select('-password').populate('role');
 
     if (!user) {
       throw new ApiError('User not found. Token is invalid.', 401);
@@ -37,14 +37,34 @@ export const protect = asyncHandler(async (req, res, next) => {
 });
 
 /**
- * Authorize specific roles
+ * Authorize specific role keys (for backward compatibility)
  * Usage: authorize('admin', 'teacher')
  */
-export const authorize = (...roles) => {
+export const authorize = (...roleKeys) => {
   return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
+    const userRoleKey = req.user.role?.key;
+    if (!roleKeys.includes(userRoleKey)) {
       throw new ApiError(
-        `Access denied. Role '${req.user.role}' is not authorized for this action.`,
+        `Access denied. Role '${userRoleKey}' is not authorized for this action.`,
+        403
+      );
+    }
+    next();
+  };
+};
+
+/**
+ * Authorize by permission
+ * Usage: authorizeByPermission('can_mark_attendance')
+ */
+export const authorizeByPermission = (permission) => {
+  return (req, res, next) => {
+    const userPermissions = req.user.role?.permissions || [];
+    const hasPermission = userPermissions.includes('*') || userPermissions.includes(permission);
+    
+    if (!hasPermission) {
+      throw new ApiError(
+        `Access denied. Permission '${permission}' not granted.`,
         403
       );
     }
