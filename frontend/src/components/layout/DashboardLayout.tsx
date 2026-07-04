@@ -3,6 +3,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth.store';
 import { Avatar } from '@/components/ui/Avatar';
+import { Badge } from '@/components/ui/Badge';
 import toast from 'react-hot-toast';
 import api from '@/lib/axios';
 import {
@@ -18,18 +19,17 @@ import {
   Settings,
   LogOut,
   Menu,
-  X,
   ChevronRight,
   Layers,
 } from 'lucide-react';
 
-const navItems = {
+const navItems: Record<string, { label: string; icon: any; to: string }[]> = {
   admin: [
-  { label: 'Dashboard', icon: LayoutDashboard, to: '/dashboard' },
-  { label: 'Students', icon: Users, to: '/students' },
-  { label: 'Classes', icon: Layers, to: '/classes' },
-  { label: 'Subjects', icon: BookOpen, to: '/subjects' },
-  { label: 'Teachers', icon: BookOpen, to: '/teachers' },
+    { label: 'Dashboard', icon: LayoutDashboard, to: '/dashboard' },
+    { label: 'Students', icon: Users, to: '/students' },
+    { label: 'Classes', icon: Layers, to: '/classes' },
+    { label: 'Subjects', icon: BookOpen, to: '/subjects' },
+    { label: 'Teachers', icon: BookOpen, to: '/teachers' },
     { label: 'Attendance', icon: CalendarCheck, to: '/attendance' },
     { label: 'Exams & Results', icon: FileText, to: '/exams' },
     { label: 'Fee Management', icon: DollarSign, to: '/fees' },
@@ -49,12 +49,20 @@ const navItems = {
   ],
 };
 
+const roleBadgeVariant: Record<string, 'info' | 'warning' | 'success'> = {
+  admin: 'info',
+  teacher: 'warning',
+  student: 'success',
+};
+
 export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
 
-  const items = navItems[user?.role || 'student'];
+  const roleKey = typeof user?.role === 'object' ? (user?.role as any)?.key : user?.role;
+  const roleName = typeof user?.role === 'object' ? (user?.role as any)?.name : user?.role;
+  const items = navItems[roleKey || 'student'] || navItems['student'];
 
   const handleLogout = async () => {
     try {
@@ -123,6 +131,15 @@ export default function DashboardLayout() {
           <LogOut className="h-4 w-4" />
           Sign out
         </button>
+        <div className="flex items-center gap-3 px-3 py-3 mt-1 bg-surface-50 rounded-xl">
+          <Avatar name={user?.name || ''} url={user?.avatar?.url} size="sm" />
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-medium text-slate-800 truncate">{user?.name}</p>
+            <Badge variant={roleBadgeVariant[roleKey || 'student']} className="mt-0.5">
+              {roleName || roleKey}
+            </Badge>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -173,7 +190,7 @@ export default function DashboardLayout() {
               <Avatar name={user?.name || ''} url={user?.avatar?.url} size="sm" />
               <div className="hidden md:block">
                 <p className="text-sm font-medium text-slate-800 leading-none">{user?.name}</p>
-                <p className="text-xs text-slate-400 capitalize mt-0.5">{user?.role}</p>
+                <p className="text-xs text-slate-400 capitalize mt-0.5">{roleName || roleKey}</p>
               </div>
             </div>
           </div>

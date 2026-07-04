@@ -1,10 +1,16 @@
-export type Role = 'admin' | 'teacher' | 'student';
+export interface UserRole {
+  _id: string;
+  key: string;
+  name: string;
+  permissions: string[];
+  homeRoute: string;
+}
 
 export interface User {
   _id: string;
   name: string;
   email: string;
-  role: Role;
+  role: UserRole;
   avatar: { public_id: string | null; url: string | null };
   isActive: boolean;
   lastLogin?: string;

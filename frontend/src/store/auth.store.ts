@@ -25,7 +25,11 @@ export const useAuthStore = create<AuthStore>()(
     }),
     {
       name: 'sms-auth',
-      partialize: (state) => ({ user: state.user, accessToken: state.accessToken, isAuthenticated: state.isAuthenticated }),
+      partialize: (state) => ({
+        user: state.user,
+        accessToken: state.accessToken,
+        isAuthenticated: state.isAuthenticated,
+      }),
     }
   )
 );

@@ -35,12 +35,8 @@ export default function LoginPage() {
       toast.success(`Welcome back, ${user.name.split(' ')[0]}!`);
 
       // Redirect based on role
-      const routes: Record<string, string> = {
-        admin: '/dashboard',
-        teacher: '/dashboard',
-        student: '/my-profile',
-      };
-      navigate(routes[user.role] || '/dashboard');
+      const homeRoute = user.role?.homeRoute || '/dashboard';
+navigate(homeRoute);
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Login failed. Please try again.');
     }

@@ -1,12 +1,13 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/store/auth.store';
-import type { Role } from '@/types';
+
 
 interface ProtectedRouteProps {
-  allowedRoles?: Role[];
+  allowedRoles?: string[];
+  requiredPermissions?: string[];
 }
 
-export default function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
+export default function ProtectedRoute({ allowedRoles, requiredPermissions }: ProtectedRouteProps) {
   const { isAuthenticated, user } = useAuthStore();
   const location = useLocation();
 
@@ -14,8 +15,23 @@ export default function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (allowedRoles && user && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/unauthorized" replace />;
+  // Check role key
+  if (allowedRoles && user) {
+    const userRoleKey = typeof user.role === 'object' ? (user.role as any)?.key : user.role;
+    if (!allowedRoles.includes(userRoleKey)) {
+      return <Navigate to="/unauthorized" replace />;
+    }
+  }
+
+  // Check permissions
+  if (requiredPermissions && user) {
+    const userPermissions = typeof user.role === 'object' ? (user.role as any)?.permissions || [] : [];
+    const hasAll = requiredPermissions.every(
+      (p) => userPermissions.includes('*') || userPermissions.includes(p)
+    );
+    if (!hasAll) {
+      return <Navigate to="/unauthorized" replace />;
+    }
   }
 
   return <Outlet />;

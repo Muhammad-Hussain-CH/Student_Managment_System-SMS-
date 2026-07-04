@@ -8,6 +8,8 @@ import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 
 import connectDB from './config/db.js';
+
+import './models/Role.model.js';
 import errorHandler from './middleware/error.middleware.js';
 
 // Routes
@@ -20,6 +22,7 @@ import attendanceRoutes from './routes/attendance.routes.js';
 import examRoutes from './routes/exam.routes.js';
 import feeRoutes from './routes/fee.routes.js';
 import dashboardRoutes from './routes/dashboard.routes.js';
+import roleRoutes from './routes/role.routes.js';
 
 dotenv.config();
 
@@ -83,6 +86,7 @@ app.use('/api/attendance', attendanceRoutes);
 app.use('/api/exams', examRoutes);
 app.use('/api/fees', feeRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/roles', roleRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {
