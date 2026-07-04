@@ -22,11 +22,12 @@ import MyProfilePage from './pages/MyProfilePage.tsx';
 import ReportsPage from '@/pages/ReportsPage';
 import StudentDetailPage from '@/pages/StudentDetailPage';
 import SettingsPage from '@/pages/SettingsPage';
+import RolesPage from '@/pages/RolesPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
+      staleTime: 1000 * 60 * 5,
       retry: 1,
     },
   },
@@ -43,13 +44,14 @@ const Placeholder = ({ title }: { title: string }) => (
 
 function AppRoutes() {
   const { isAuthenticated, user } = useAuthStore();
+  const roleKey = typeof user?.role === 'object' ? (user?.role as any)?.key : user?.role;
 
   return (
     <Routes>
       {/* Public */}
       <Route
         path="/login"
-        element={isAuthenticated ? <Navigate to={user?.role === 'student' ? '/my-profile' : '/dashboard'} replace /> : <LoginPage />}
+        element={isAuthenticated ? <Navigate to={roleKey === 'student' ? '/my-profile' : '/dashboard'} replace /> : <LoginPage />}
       />
 
       {/* Admin + Teacher */}
@@ -57,17 +59,23 @@ function AppRoutes() {
         <Route element={<DashboardLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/students" element={<StudentsPage />} />
-            <Route path="/students/new" element={<AddStudentPage />} />
+          <Route path="/students/new" element={<AddStudentPage />} />
           <Route path="/students/:id" element={<StudentDetailPage />} />
           <Route path="/classes" element={<ClassesPage />} />
-<Route path="/subjects" element={<SubjectsPage />} />
+          <Route path="/subjects" element={<SubjectsPage />} />
           <Route path="/teachers" element={<TeachersPage />} />
-
           <Route path="/attendance" element={<AttendancePage />} />
           <Route path="/exams" element={<ExamsPage />} />
           <Route path="/fees" element={<FeesPage />} />
-          <Route path="/reports" element={<ReportsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
+        </Route>
+      </Route>
+
+      {/* Admin only */}
+      <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+        <Route element={<DashboardLayout />}>
+          <Route path="/reports" element={<ReportsPage />} />
+          <Route path="/roles" element={<RolesPage />} />
         </Route>
       </Route>
 
@@ -76,7 +84,6 @@ function AppRoutes() {
         <Route element={<DashboardLayout />}>
           <Route path="/my-profile" element={<MyProfilePage />} />
           <Route path="/my-attendance" element={<MyAttendancePage />} />
-
           <Route path="/my-results" element={<MyResultsPage />} />
           <Route path="/my-fees" element={<MyFeesPage />} />
         </Route>
@@ -84,7 +91,7 @@ function AppRoutes() {
 
       {/* Fallbacks */}
       <Route path="/unauthorized" element={<Placeholder title="403 — Access Denied" />} />
-      <Route path="/" element={<Navigate to={isAuthenticated ? '/dashboard' : '/login'} replace />} />
+      <Route path="/" element={<Navigate to={isAuthenticated ? (roleKey === 'student' ? '/my-profile' : '/dashboard') : '/login'} replace />} />
       <Route path="*" element={<Placeholder title="404 — Page Not Found" />} />
     </Routes>
   );

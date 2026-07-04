@@ -21,6 +21,7 @@ import {
   Menu,
   ChevronRight,
   Layers,
+  Shield,
 } from 'lucide-react';
 
 const navItems: Record<string, { label: string; icon: any; to: string }[]> = {
@@ -34,6 +35,7 @@ const navItems: Record<string, { label: string; icon: any; to: string }[]> = {
     { label: 'Exams & Results', icon: FileText, to: '/exams' },
     { label: 'Fee Management', icon: DollarSign, to: '/fees' },
     { label: 'Reports', icon: BarChart3, to: '/reports' },
+    { label: 'Roles', icon: Shield, to: '/roles' },
   ],
   teacher: [
     { label: 'Dashboard', icon: LayoutDashboard, to: '/dashboard' },
