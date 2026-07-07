@@ -35,13 +35,13 @@ export default function TeachersPage() {
   const createMutation = useMutation({
     mutationFn: async () => {
       const res = await api.post('/auth/register', {
-        name: form.name,
-        email: form.email,
-        password: form.password,
-        role: 'teacher',
-        qualification: form.qualification,
-        department: form.department,
-      });
+  name: form.name,
+  email: form.email,
+  password: form.password,
+  roleKey: 'teacher',
+  qualification: form.qualification,
+  department: form.department,
+});
       return res.data;
     },
     onSuccess: () => {

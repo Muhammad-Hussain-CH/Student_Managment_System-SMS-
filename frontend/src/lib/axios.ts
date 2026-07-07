@@ -33,7 +33,13 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Don't try to refresh if the failing request IS the login or refresh endpoint
+    const isAuthRoute =
+      originalRequest.url?.includes('/auth/login') ||
+      originalRequest.url?.includes('/auth/refresh') ||
+      originalRequest.url?.includes('/auth/register');
+
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthRoute) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });

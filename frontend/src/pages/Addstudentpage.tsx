@@ -27,12 +27,12 @@ export default function AddStudentPage() {
   const createMutation = useMutation({
     mutationFn: async () => {
       const res = await api.post('/auth/register', {
-        name: form.name,
-        email: form.email,
-        password: form.password,
-        role: 'student',
-        program: form.program,
-      });
+  name: form.name,
+  email: form.email,
+  password: form.password,
+  roleKey: 'student',
+  program: form.program,
+});
       return res.data;
     },
     onSuccess: async (data) => {
