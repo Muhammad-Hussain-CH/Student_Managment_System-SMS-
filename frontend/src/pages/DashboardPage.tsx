@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import {
   Users, BookOpen, CalendarCheck, DollarSign,
-  TrendingUp, TrendingDown, GraduationCap, AlertCircle
+  TrendingUp, TrendingDown, GraduationCap,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '@/lib/axios';
@@ -55,6 +55,7 @@ const StatCard = ({
 
 export default function DashboardPage() {
   const { user } = useAuthStore();
+  const roleKey = typeof user?.role === 'object' ? (user?.role as any)?.key : user?.role;
 
   const { data: stats, isLoading } = useQuery<DashboardStats>({
     queryKey: ['dashboard-stats'],
@@ -62,7 +63,7 @@ export default function DashboardPage() {
       const res = await api.get('/dashboard/stats');
       return res.data.data;
     },
-    enabled: user?.role === 'admin',
+    enabled: roleKey === 'admin',
   });
 
   const greeting = () => {
@@ -74,7 +75,6 @@ export default function DashboardPage() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
-      {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-slate-800">
           {greeting()}, {user?.name.split(' ')[0]} 👋
@@ -84,8 +84,8 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      {/* Stats Grid */}
-      {user?.role === 'admin' && (
+      {/* Admin stats */}
+      {roleKey === 'admin' && (
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           <StatCard
             label="Total Students"
@@ -120,48 +120,8 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Teacher dashboard */}
-     {/* Teacher dashboard */}
-{user?.role === 'teacher' && (
-  <div className="space-y-5">
-    {/* Quick actions */}
-    <div className="card p-5">
-      <h2 className="text-sm font-semibold text-slate-700 mb-3">Quick Actions</h2>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-        {[
-          { label: 'Mark Attendance', icon: CalendarCheck, to: '/attendance' },
-          { label: 'Enter Results', icon: BookOpen, to: '/exams' },
-          { label: 'View Students', icon: Users, to: '/students' },
-        ].map(({ label, icon: Icon, to }) => (
-          <Link
-            key={label}
-            to={to}
-            className="flex flex-col items-center gap-2 p-4 rounded-xl border border-surface-200 hover:border-primary-300 hover:bg-primary-50 transition-all group"
-          >
-            <Icon className="h-5 w-5 text-slate-400 group-hover:text-primary-600 transition-colors" />
-            <span className="text-xs font-medium text-slate-600 group-hover:text-primary-700 text-center">{label}</span>
-          </Link>
-        ))}
-      </div>
-    </div>
-
-    {/* Teacher info card */}
-    <div className="card p-5 border-l-4 border-l-blue-500">
-      <div className="flex items-start gap-3">
-        <BookOpen className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
-        <div>
-          <p className="text-sm font-semibold text-slate-800">Welcome to your portal</p>
-          <p className="text-sm text-slate-500 mt-1">
-            You can mark attendance for your classes, enter exam results, and view students assigned to your subjects.
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-)}
-
-      {/* Quick Actions */}
-      {user?.role === 'admin' && (
+      {/* Admin quick actions */}
+      {roleKey === 'admin' && (
         <div className="card p-5">
           <h2 className="text-sm font-semibold text-slate-700 mb-3">Quick Actions</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -184,8 +144,33 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Recent Students */}
-      {user?.role === 'admin' && !isLoading && stats?.recentStudents && stats.recentStudents.length > 0 && (
+      {/* Teacher quick actions */}
+      {roleKey === 'teacher' && (
+        <div className="space-y-5">
+          <div className="card p-5">
+            <h2 className="text-sm font-semibold text-slate-700 mb-3">Quick Actions</h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {[
+                { label: 'Mark Attendance', icon: CalendarCheck, to: '/attendance' },
+                { label: 'Enter Results', icon: BookOpen, to: '/exams' },
+                { label: 'View Students', icon: Users, to: '/students' },
+              ].map(({ label, icon: Icon, to }) => (
+                <Link
+                  key={label}
+                  to={to}
+                  className="flex flex-col items-center gap-2 p-4 rounded-xl border border-surface-200 hover:border-primary-300 hover:bg-primary-50 transition-all group"
+                >
+                  <Icon className="h-5 w-5 text-slate-400 group-hover:text-primary-600 transition-colors" />
+                  <span className="text-xs font-medium text-slate-600 group-hover:text-primary-700 text-center">{label}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Recent Students — admin only */}
+      {roleKey === 'admin' && !isLoading && stats?.recentStudents && stats.recentStudents.length > 0 && (
         <div className="card overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-surface-100">
             <h2 className="text-sm font-semibold text-slate-700">Recently Registered Students</h2>
@@ -209,9 +194,6 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
-
-      
-      
     </div>
   );
 }

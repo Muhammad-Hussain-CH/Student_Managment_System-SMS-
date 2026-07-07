@@ -23,6 +23,8 @@ import ReportsPage from '@/pages/ReportsPage';
 import StudentDetailPage from '@/pages/StudentDetailPage';
 import SettingsPage from '@/pages/SettingsPage';
 import RolesPage from '@/pages/RolesPage';
+import NotFoundPage from '@/pages/NotFoundPage';
+import UnauthorizedPage from '@/pages/UnauthorizedPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -71,13 +73,24 @@ function AppRoutes() {
         </Route>
       </Route>
 
-      {/* Admin only */}
-      <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
-        <Route element={<DashboardLayout />}>
-          <Route path="/reports" element={<ReportsPage />} />
-          <Route path="/roles" element={<RolesPage />} />
-        </Route>
-      </Route>
+      {/* Admin + Teacher */}
+<Route element={<ProtectedRoute allowedRoles={['admin', 'teacher']} />}>
+  <Route element={<DashboardLayout />}>
+    <Route path="/dashboard" element={<DashboardPage />} />
+    <Route path="/students" element={<StudentsPage />} />
+    <Route path="/students/new" element={<AddStudentPage />} />
+    <Route path="/students/:id" element={<StudentDetailPage />} />
+    <Route path="/classes" element={<ClassesPage />} />
+    <Route path="/subjects" element={<SubjectsPage />} />
+    <Route path="/teachers" element={<TeachersPage />} />
+    <Route path="/attendance" element={<AttendancePage />} />
+    <Route path="/exams" element={<ExamsPage />} />
+    <Route path="/fees" element={<FeesPage />} />
+    <Route path="/settings" element={<SettingsPage />} />
+    <Route path="/reports" element={<ReportsPage />} />
+    <Route path="/roles" element={<RolesPage />} />
+  </Route>
+</Route>
 
       {/* Student self-portal */}
       <Route element={<ProtectedRoute allowedRoles={['student']} />}>
@@ -90,9 +103,10 @@ function AppRoutes() {
       </Route>
 
       {/* Fallbacks */}
-      <Route path="/unauthorized" element={<Placeholder title="403 — Access Denied" />} />
+      <Route path="/unauthorized" element={<UnauthorizedPage />} />
+<Route path="*" element={<NotFoundPage />} />
       <Route path="/" element={<Navigate to={isAuthenticated ? (roleKey === 'student' ? '/my-profile' : '/dashboard') : '/login'} replace />} />
-      <Route path="*" element={<Placeholder title="404 — Page Not Found" />} />
+      
     </Routes>
   );
 }
@@ -100,7 +114,7 @@ function AppRoutes() {
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_relativeSplatPath: true }}>
         <AppRoutes />
         <Toaster
           position="top-right"

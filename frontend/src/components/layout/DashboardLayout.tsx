@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth.store';
@@ -58,9 +58,17 @@ const roleBadgeVariant: Record<string, 'info' | 'warning' | 'success'> = {
 };
 
 export default function DashboardLayout() {
+  
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const roleKey = typeof user?.role === 'object' ? (user?.role as any)?.key : user?.role;
   const roleName = typeof user?.role === 'object' ? (user?.role as any)?.name : user?.role;
@@ -77,9 +85,9 @@ export default function DashboardLayout() {
   };
 
   const SidebarContent = () => (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full overflow-hidden">
       {/* Logo */}
-      <div className="flex items-center gap-3 px-5 py-5 border-b border-surface-100">
+      <div className="flex items-center gap-3 px-5 py-4 border-b border-surface-100 flex-shrink-0">
         <div className="h-9 w-9 rounded-xl bg-primary-600 flex items-center justify-center flex-shrink-0">
           <GraduationCap className="h-5 w-5 text-white" />
         </div>
@@ -90,16 +98,16 @@ export default function DashboardLayout() {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+      <nav className="flex-1 px-3 py-3 flex flex-col gap-0.5 overflow-y-auto">
         {items.map(({ label, icon: Icon, to }) => (
           <NavLink
             key={to}
             to={to}
-            end={to === '/dashboard'}
+            end={to === '/dashboard' || to === '/my-profile'}
             onClick={() => setSidebarOpen(false)}
             className={({ isActive }) =>
               cn(
-                'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all',
+                'flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all',
                 isActive
                   ? 'bg-primary-50 text-primary-700'
                   : 'text-slate-600 hover:bg-surface-100 hover:text-slate-800'
@@ -109,77 +117,83 @@ export default function DashboardLayout() {
             {({ isActive }) => (
               <>
                 <Icon className={cn('h-4 w-4 flex-shrink-0', isActive && 'text-primary-600')} />
-                <span className="flex-1">{label}</span>
-                {isActive && <ChevronRight className="h-3 w-3 text-primary-400" />}
+                <span className="flex-1 truncate">{label}</span>
+                {isActive && <ChevronRight className="h-3 w-3 text-primary-400 flex-shrink-0" />}
               </>
             )}
           </NavLink>
         ))}
       </nav>
 
-      {/* Bottom: user + logout */}
-      <div className="border-t border-surface-100 p-3 space-y-1">
+      {/* Bottom: settings + logout */}
+      <div className="border-t border-surface-100 p-3 flex-shrink-0 space-y-0.5">
         <NavLink
           to="/settings"
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-500 hover:bg-surface-100 transition-all"
+          onClick={() => setSidebarOpen(false)}
+          className={({ isActive }) =>
+            cn(
+              'flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all',
+              isActive ? 'bg-primary-50 text-primary-700' : 'text-slate-500 hover:bg-surface-100'
+            )
+          }
         >
           <Settings className="h-4 w-4" />
           Settings
         </NavLink>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-red-500 hover:bg-red-50 transition-all"
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 transition-all"
         >
           <LogOut className="h-4 w-4" />
           Sign out
         </button>
-        <div className="flex items-center gap-3 px-3 py-3 mt-1 bg-surface-50 rounded-xl">
-          <Avatar name={user?.name || ''} url={user?.avatar?.url} size="sm" />
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-slate-800 truncate">{user?.name}</p>
-            <Badge variant={roleBadgeVariant[roleKey || 'student']} className="mt-0.5">
-              {roleName || roleKey}
-            </Badge>
-          </div>
-        </div>
       </div>
     </div>
   );
 
   return (
     <div className="flex h-screen bg-surface-50 overflow-hidden">
-      {/* Desktop sidebar */}
-      <aside className="hidden lg:flex flex-col w-60 bg-white border-r border-surface-200 flex-shrink-0">
-        <SidebarContent />
-      </aside>
+      {/* Desktop sidebar — only renders on large screens */}
+      {isDesktop && (
+        <aside className="flex flex-col w-56 bg-white border-r border-surface-200 flex-shrink-0 h-screen overflow-hidden">
+          <SidebarContent />
+        </aside>
+      )}
 
-      {/* Mobile sidebar overlay */}
-      {sidebarOpen && (
-        <div className="lg:hidden fixed inset-0 z-40 flex">
+      {/* Mobile sidebar overlay — only renders when open on small screens */}
+      {!isDesktop && sidebarOpen && (
+        <div className="fixed inset-0 z-40 flex">
           <div
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={() => setSidebarOpen(false)}
           />
-          <aside className="relative z-50 flex flex-col w-60 bg-white shadow-xl">
+          <aside className="relative z-50 flex flex-col w-56 bg-white shadow-xl h-full overflow-hidden">
             <SidebarContent />
           </aside>
         </div>
       )}
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
         {/* Top bar */}
         <header className="bg-white border-b border-surface-200 px-4 lg:px-6 h-14 flex items-center justify-between flex-shrink-0">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="lg:hidden p-2 rounded-lg hover:bg-surface-100 transition-colors"
-          >
-            <Menu className="h-5 w-5 text-slate-600" />
-          </button>
+          {!isDesktop && (
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="p-2 rounded-lg hover:bg-surface-100 transition-colors"
+            >
+              <Menu className="h-5 w-5 text-slate-600" />
+            </button>
+          )}
 
           <div className="hidden lg:block">
             <p className="text-sm font-medium text-slate-800">
-              {new Date().toLocaleDateString('en-PK', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+              {new Date().toLocaleDateString('en-PK', {
+                weekday: 'long',
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric',
+              })}
             </p>
           </div>
 
@@ -190,9 +204,11 @@ export default function DashboardLayout() {
             </button>
             <div className="flex items-center gap-2.5">
               <Avatar name={user?.name || ''} url={user?.avatar?.url} size="sm" />
-              <div className="hidden md:block">
+              <div>
                 <p className="text-sm font-medium text-slate-800 leading-none">{user?.name}</p>
-                <p className="text-xs text-slate-400 capitalize mt-0.5">{roleName || roleKey}</p>
+                <Badge variant={roleBadgeVariant[roleKey || 'student']} className="mt-0.5">
+                  {roleName || roleKey}
+                </Badge>
               </div>
             </div>
           </div>
