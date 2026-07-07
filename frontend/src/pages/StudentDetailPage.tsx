@@ -1,15 +1,71 @@
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, User, BookOpen, CalendarCheck, DollarSign } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { ArrowLeft, User, BookOpen, CalendarCheck, DollarSign, Edit, Trash2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import api from '@/lib/axios';
 import { Avatar } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
+import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
 import { formatDate } from '@/lib/utils';
+import { useAuthStore } from '@/store/auth.store';
 import type { StudentProfile } from '@/types';
 
 export default function StudentDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [showEdit, setShowEdit] = useState(false);
+const [editForm, setEditForm] = useState({ name: '', program: '', batch: '' });
+const queryClient = useQueryClient();
+
+const deleteMutation = useMutation({
+  mutationFn: async () => {
+    const res = await api.delete(`/students/${id}`);
+    return res.data;
+  },
+  onSuccess: () => {
+    toast.success('Student deactivated successfully.');
+    queryClient.invalidateQueries({ queryKey: ['student', id] });
+  },
+  onError: (err: any) => {
+    toast.error(err.response?.data?.message || 'Failed to deactivate student.');
+  },
+});
+
+const updateMutation = useMutation({
+  mutationFn: async () => {
+    const res = await api.patch(`/students/${id}`, {
+      name: editForm.name,
+      program: editForm.program,
+      batch: editForm.batch,
+    });
+    return res.data;
+  },
+  onSuccess: () => {
+    toast.success('Student updated successfully.');
+    queryClient.invalidateQueries({ queryKey: ['student', id] });
+    setShowEdit(false);
+  },
+  onError: (err: any) => {
+    toast.error(err.response?.data?.message || 'Failed to update student.');
+  },
+});
+
+const handleDelete = () => {
+  if (window.confirm(`Are you sure you want to ${data?.isActive ? 'deactivate' : 'activate'} this student?`)) {
+    deleteMutation.mutate();
+  }
+};
+
+const handleEditOpen = () => {
+  setEditForm({
+    name: data?.user?.name || '',
+    program: data?.program || '',
+    batch: data?.batch || '',
+  });
+  setShowEdit(true);
+};
 
   const { data, isLoading } = useQuery<StudentProfile>({
     queryKey: ['student', id],
@@ -77,14 +133,34 @@ export default function StudentDetailPage() {
       {/* Profile header */}
       <div className="card p-6">
         <div className="flex items-start gap-5">
-          <Avatar name={student.user.name} url={student.photo?.url} size="xl" />
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-xl font-bold text-slate-800">{student.user.name}</h1>
-              <Badge variant={student.isActive ? 'success' : 'danger'}>
-                {student.isActive ? 'Active' : 'Inactive'}
-              </Badge>
-            </div>
+  <Avatar name={student.user.name} url={student.photo?.url} size="xl" />
+  <div className="flex-1 min-w-0">
+    <div className="flex items-center justify-between flex-wrap gap-3">
+      <div className="flex items-center gap-3 flex-wrap">
+        <h1 className="text-xl font-bold text-slate-800">{student.user.name}</h1>
+        <Badge variant={student.isActive ? 'success' : 'danger'}>
+          {student.isActive ? 'Active' : 'Inactive'}
+        </Badge>
+      </div>
+      {useAuthStore.getState().user && (useAuthStore.getState().user?.role as any)?.key === 'admin' && (
+        <div className="flex gap-2">
+          <button
+           onClick={() => handleEditOpen()}
+            className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border border-primary-200 text-primary-600 hover:bg-primary-50 font-medium transition-all"
+          >
+            <Edit className="h-3.5 w-3.5" />
+            Edit
+          </button>
+          <button
+            onClick={handleDelete}
+            className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border border-red-200 text-red-500 hover:bg-red-50 font-medium transition-all"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+            {student.isActive ? 'Deactivate' : 'Activate'}
+          </button>
+        </div>
+      )}
+    </div>
             <p className="text-sm text-slate-500 mt-1">{student.user.email}</p>
             <div className="flex flex-wrap gap-4 mt-3">
               <div>
@@ -115,8 +191,39 @@ export default function StudentDetailPage() {
           </div>
         </div>
       </div>
-
+{showEdit && (
+  <div className="card p-5 space-y-4">
+    <h2 className="text-sm font-semibold text-slate-700">Edit Student</h2>
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <Input
+        label="Full Name"
+        value={editForm.name}
+        onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+      />
+      <Input
+        label="Program"
+        value={editForm.program}
+        onChange={(e) => setEditForm({ ...editForm, program: e.target.value })}
+      />
+      <Input
+        label="Batch"
+        placeholder="e.g. Fall 2024"
+        value={editForm.batch}
+        onChange={(e) => setEditForm({ ...editForm, batch: e.target.value })}
+      />
+    </div>
+    <div className="flex gap-3">
+      <Button onClick={() => updateMutation.mutate()} isLoading={updateMutation.isPending}>
+        Save Changes
+      </Button>
+      <Button variant="secondary" onClick={() => setShowEdit(false)}>
+        Cancel
+      </Button>
+    </div>
+  </div>
+)}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
         {/* Attendance Summary */}
         <div className="card p-5">
           <div className="flex items-center gap-2 mb-3">
